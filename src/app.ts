@@ -1,11 +1,25 @@
+import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
+import fs from "fs";
+import path from "path";
 import bodyParser from "body-parser";
+import helmet from "helmet";
+import compression from "compression";
 import mongoose from "mongoose";
-
+import morgan from "morgan";
 import userRoutes from "./routes/user";
 
 const app = express();
 
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
+// Middlewares
+app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
+app.use(compression()); // Compress all routes
+app.use(morgan("combined", { stream: accessLogStream })); // Logging
 app.use(bodyParser.json());
 
 // enable CORS
@@ -28,11 +42,9 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://rajeshvijayan:rajeshVijayan@cluster0.abgtw.mongodb.net/profileApp?retryWrites=true&w=majority"
-  )
+  .connect(process.env.MONGODB_URI!)
   .then(() => {
-    app.listen(8080, () => {
+    app.listen(process.env.PORT || 8080, () => {
       console.log("Server is running on port 8080");
     });
   })
