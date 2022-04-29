@@ -12,15 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postComments = exports.getComments = void 0;
+exports.loginController = exports.postComments = exports.getComments = void 0;
 const express_validator_1 = require("express-validator");
 const comment_1 = __importDefault(require("../models/comment"));
+const user_1 = __importDefault(require("../models/user"));
 const throwError_1 = __importDefault(require("../utils/throwError"));
 //connect comments..
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let comments;
     try {
-        comments = yield comment_1.default.find();
+        comments = yield comment_1.default.findOne({ email: "raj@test.com" });
         res.status(200).json({ comments: comments });
     }
     catch (error) {
@@ -31,10 +32,7 @@ exports.getComments = getComments;
 const postComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        const error = new Error("Validation failed, entered data is incorrect.");
-        // error.statusCode = 422;
-        // error.data = errors.array();
-        next(error);
+        (0, throwError_1.default)(next, null, "Validation failed, entered data is incorrect.");
     }
     const comment = new comment_1.default({
         name: req.body.name,
@@ -42,7 +40,14 @@ const postComments = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         phone: req.body.phone,
         comment: req.body.comment,
     });
+    const user = new user_1.default({
+        name: req.body.name,
+        email: req.body.email,
+        password: "req.body.password",
+    });
     try {
+        const userData = yield user.save();
+        console.log(userData);
         const result = yield comment.save();
         res
             .status(200)
@@ -53,3 +58,25 @@ const postComments = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.postComments = postComments;
+const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        (0, throwError_1.default)(next, null, "Please check your entered data.", 401);
+    }
+    try {
+        const result = yield user_1.default.findOne({
+            email: req.body.email,
+            password: req.body.password,
+        });
+        if (result) {
+            res.status(200).json({ message: "User Authenticated", user: result });
+        }
+        else {
+            (0, throwError_1.default)(next, null, "Invalid username or password", 401);
+        }
+    }
+    catch (error) {
+        (0, throwError_1.default)(next, error);
+    }
+});
+exports.loginController = loginController;

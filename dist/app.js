@@ -30,11 +30,8 @@ app.use((req, res, next) => {
 app.use("/user", user_1.default);
 // Error handling middleware
 app.use((error, req, res, next) => {
-    console.log(error);
     const status = error.statusCode || 500;
-    const message = error.message;
-    const data = error.data;
-    res.status(status).json({ message: message, data: data });
+    res.status(status).json({ message: error.message });
 });
 mongoose_1.default
     .connect(process.env.MONGODB_URI)
