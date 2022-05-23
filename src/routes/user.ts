@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
+import isAuth from "../middlewares/is-auth";
 
 import {
   getComments,
@@ -13,6 +14,7 @@ router.get("/comment", getComments);
 
 router.post(
   "/comment",
+  // isAuth, //middleware for checking token, not using here as its a public route
   [body("name").trim().isLength({ min: 3 })],
   postComments
 );

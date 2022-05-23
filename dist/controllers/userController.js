@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginController = exports.postComments = exports.getComments = void 0;
 const express_validator_1 = require("express-validator");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const comment_1 = __importDefault(require("../models/comment"));
 const user_1 = __importDefault(require("../models/user"));
 const throwError_1 = __importDefault(require("../utils/throwError"));
@@ -40,14 +41,7 @@ const postComments = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         phone: req.body.phone,
         comment: req.body.comment,
     });
-    const user = new user_1.default({
-        name: req.body.name,
-        email: req.body.email,
-        password: "req.body.password",
-    });
     try {
-        const userData = yield user.save();
-        console.log(userData);
         const result = yield comment.save();
         res
             .status(200)
@@ -69,7 +63,12 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
             password: req.body.password,
         });
         if (result) {
-            res.status(200).json({ message: "User Authenticated", user: result });
+            const token = jsonwebtoken_1.default.sign({ email: result.email }, process.env.JWT_SECRET, {
+                expiresIn: "1h",
+            });
+            res
+                .status(200)
+                .json({ token: token, message: "User Authenticated", user: result });
         }
         else {
             (0, throwError_1.default)(next, null, "Invalid username or password", 401);
