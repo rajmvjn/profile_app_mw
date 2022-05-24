@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginController = exports.postComments = exports.getComments = void 0;
+exports.loginController = exports.postComments = exports.deleteComment = exports.getComments = void 0;
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const comment_1 = __importDefault(require("../models/comment"));
@@ -22,7 +22,7 @@ const throwError_1 = __importDefault(require("../utils/throwError"));
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let comments;
     try {
-        comments = yield comment_1.default.findOne({ email: "raj@test.com" });
+        comments = yield comment_1.default.find();
         res.status(200).json({ comments: comments });
     }
     catch (error) {
@@ -30,6 +30,22 @@ const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getComments = getComments;
+const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let id = req.params.id;
+    try {
+        let response = yield comment_1.default.findByIdAndDelete(id);
+        if (response) {
+            res.status(200).json({ message: "Comment deleted successfully" });
+        }
+        else {
+            (0, throwError_1.default)(next, null, "Comment not found", 404);
+        }
+    }
+    catch (error) {
+        (0, throwError_1.default)(next, error);
+    }
+});
+exports.deleteComment = deleteComment;
 const postComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -66,6 +82,7 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
             const token = jsonwebtoken_1.default.sign({ email: result.email }, process.env.JWT_SECRET, {
                 expiresIn: "1h",
             });
+            console.log(token);
             res
                 .status(200)
                 .json({ token: token, message: "User Authenticated", user: result });

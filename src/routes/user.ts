@@ -5,10 +5,13 @@ import isAuth from "../middlewares/is-auth";
 import {
   getComments,
   postComments,
+  deleteComment,
   loginController,
 } from "../controllers/userController";
 
 const router = Router();
+
+//User comments section...
 
 router.get("/comment", getComments);
 
@@ -18,6 +21,10 @@ router.post(
   [body("name").trim().isLength({ min: 3 })],
   postComments
 );
+
+router.delete("/comment/:id", isAuth, deleteComment);
+
+//User comments section ends...
 
 router.post(
   "/login",

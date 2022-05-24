@@ -11,8 +11,22 @@ export const getComments: RequestHandler = async (req, res, next) => {
   let comments;
 
   try {
-    comments = await Comment.findOne({ email: "raj@test.com" });
+    comments = await Comment.find();
     res.status(200).json({ comments: comments });
+  } catch (error) {
+    throwError(next, error);
+  }
+};
+
+export const deleteComment: RequestHandler = async (req, res, next) => {
+  let id = req.params.id;
+  try {
+    let response = await Comment.findByIdAndDelete(id);
+    if (response) {
+      res.status(200).json({ message: "Comment deleted successfully" });
+    } else {
+      throwError(next, null, "Comment not found", 404);
+    }
   } catch (error) {
     throwError(next, error);
   }
@@ -56,7 +70,7 @@ export const loginController: RequestHandler = async (req, res, next) => {
       const token = jwt.sign({ email: result.email }, process.env.JWT_SECRET!, {
         expiresIn: "1h",
       });
-
+      console.log(token);
       res
         .status(200)
         .json({ token: token, message: "User Authenticated", user: result });
