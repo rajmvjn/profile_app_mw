@@ -8,6 +8,7 @@ import compression from "compression";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import userRoutes from "./routes/user";
+import blogRoutes from "./routes/blogs";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use("/user", userRoutes);
+app.use("/api/v1", blogRoutes);
 
 // Error handling middleware
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {

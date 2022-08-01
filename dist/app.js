@@ -13,6 +13,7 @@ const compression_1 = __importDefault(require("compression"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const morgan_1 = __importDefault(require("morgan"));
 const user_1 = __importDefault(require("./routes/user"));
+const blogs_1 = __importDefault(require("./routes/blogs"));
 const app = (0, express_1.default)();
 const accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), { flags: "a" });
 // Middlewares
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
     next();
 });
 app.use("/user", user_1.default);
+app.use("/api/v1", blogs_1.default);
 // Error handling middleware
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
