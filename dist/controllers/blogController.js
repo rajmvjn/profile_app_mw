@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBlogs = exports.postBlogs = void 0;
+exports.deleteBlog = exports.getBlogs = exports.postBlogs = void 0;
 const express_validator_1 = require("express-validator");
 const blog_1 = __importDefault(require("../models/blog"));
 const throwError_1 = __importDefault(require("../utils/throwError"));
@@ -51,3 +51,13 @@ const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getBlogs = getBlogs;
+const deleteBlog = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield blog_1.default.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: "Blog deleted successfully" });
+    }
+    catch (error) {
+        (0, throwError_1.default)(next, error);
+    }
+});
+exports.deleteBlog = deleteBlog;

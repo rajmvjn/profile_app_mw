@@ -40,3 +40,12 @@ export const getBlogs: RequestHandler = async (req, res, next) => {
     throwError(next, error);
   }
 };
+
+export const deleteBlog: RequestHandler = async (req, res, next) => {
+  try {
+    await Blog.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Blog deleted successfully" });
+  } catch (error) {
+    throwError(next, error);
+  }
+};
