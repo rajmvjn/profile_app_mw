@@ -10,8 +10,6 @@ export const postBlogs: RequestHandler = async (req, res, next) => {
     throwError(next, null, "Validation failed, entered data is incorrect.");
   }
 
-  console.log(req.body);
-
   const blog = new Blog({
     userId: req.body.userId,
     blogs: {
@@ -36,6 +34,25 @@ export const getBlogs: RequestHandler = async (req, res, next) => {
   try {
     blogs = await Blog.find();
     res.status(200).json({ blogs: blogs });
+  } catch (error) {
+    throwError(next, error);
+  }
+};
+
+export const updateBlog: RequestHandler = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throwError(next, null, "Validation failed, entered data is incorrect.");
+  }
+
+  const { id } = req.params;
+  const blogs = req.body;
+
+  try {
+    const result = await Blog.findByIdAndUpdate(id, { blogs }, { new: true });
+    res
+      .status(200)
+      .json({ message: "Blog updated successfully", _id: result._id });
   } catch (error) {
     throwError(next, error);
   }

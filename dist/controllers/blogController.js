@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBlog = exports.getBlogs = exports.postBlogs = void 0;
+exports.deleteBlog = exports.updateBlog = exports.getBlogs = exports.postBlogs = void 0;
 const express_validator_1 = require("express-validator");
 const blog_1 = __importDefault(require("../models/blog"));
 const throwError_1 = __importDefault(require("../utils/throwError"));
@@ -21,7 +21,6 @@ const postBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     if (!errors.isEmpty()) {
         (0, throwError_1.default)(next, null, "Validation failed, entered data is incorrect.");
     }
-    console.log(req.body);
     const blog = new blog_1.default({
         userId: req.body.userId,
         blogs: {
@@ -51,6 +50,24 @@ const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getBlogs = getBlogs;
+const updateBlog = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        (0, throwError_1.default)(next, null, "Validation failed, entered data is incorrect.");
+    }
+    const { id } = req.params;
+    const blogs = req.body;
+    try {
+        const result = yield blog_1.default.findByIdAndUpdate(id, { blogs }, { new: true });
+        res
+            .status(200)
+            .json({ message: "Blog updated successfully", _id: result._id });
+    }
+    catch (error) {
+        (0, throwError_1.default)(next, error);
+    }
+});
+exports.updateBlog = updateBlog;
 const deleteBlog = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield blog_1.default.findByIdAndDelete(req.params.id);
