@@ -1,16 +1,17 @@
 import { Router } from "express";
-import { body } from "express-validator";
+// import { body } from "express-validator";
 
 import {
   postBlogs,
   getBlogs,
   deleteBlog,
   updateBlog,
+  uploadBlogPhoto,
 } from "../controllers/blogController";
 
 const router = Router();
 
-router.post("/blogs", postBlogs);
+router.post("/blogs", uploadBlogPhoto.single("photo"), postBlogs);
 router.get("/blogs", getBlogs);
 router.delete("/blogs/:id", deleteBlog);
 router.patch("/blogs/:id", updateBlog);

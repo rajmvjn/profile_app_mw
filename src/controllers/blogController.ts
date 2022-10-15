@@ -1,8 +1,32 @@
 import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
+import multer from "multer";
 
 import Blog from "../models/blog";
 import throwError from "../utils/throwError";
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/img/blog");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `blog-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req: any, file: any, cb: any) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new Error("please upload image"), false);
+  }
+};
+
+export const uploadBlogPhoto = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
 
 export const postBlogs: RequestHandler = async (req, res, next) => {
   const errors = validationResult(req);
@@ -10,19 +34,23 @@ export const postBlogs: RequestHandler = async (req, res, next) => {
     throwError(next, null, "Validation failed, entered data is incorrect.");
   }
 
+  const blogData = JSON.parse(req.body.blog);
+
+  console.log(req.file);
+  console.log(blogData);
+
   const blog = new Blog({
-    userId: req.body.userId,
+    userId: blogData.userId,
     blogs: {
-      fieldTypes: req.body.blogs.fieldTypes,
-      fieldValues: req.body.blogs.fieldValues,
+      fieldTypes: blogData.blogs.fieldTypes,
+      fieldValues: blogData.blogs.fieldValues,
     },
   });
 
   try {
     const result = await blog.save();
-    res
-      .status(200)
-      .json({ message: "Blog saved successfully", _id: result._id });
+    blog._id = result._id;
+    res.status(200).json(blog);
   } catch (error) {
     throwError(next, error);
   }

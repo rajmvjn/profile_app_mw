@@ -12,27 +12,51 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBlog = exports.updateBlog = exports.getBlogs = exports.postBlogs = void 0;
+exports.deleteBlog = exports.updateBlog = exports.getBlogs = exports.postBlogs = exports.uploadBlogPhoto = void 0;
 const express_validator_1 = require("express-validator");
+const multer_1 = __importDefault(require("multer"));
 const blog_1 = __importDefault(require("../models/blog"));
 const throwError_1 = __importDefault(require("../utils/throwError"));
+const multerStorage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public/img/blog");
+    },
+    filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `blog-${Date.now()}.${ext}`);
+    },
+});
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith("image")) {
+        cb(null, true);
+    }
+    else {
+        cb(new Error("please upload image"), false);
+    }
+};
+exports.uploadBlogPhoto = (0, multer_1.default)({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+});
 const postBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         (0, throwError_1.default)(next, null, "Validation failed, entered data is incorrect.");
     }
+    const blogData = JSON.parse(req.body.blog);
+    console.log(req.file);
+    console.log(blogData);
     const blog = new blog_1.default({
-        userId: req.body.userId,
+        userId: blogData.userId,
         blogs: {
-            fieldTypes: req.body.blogs.fieldTypes,
-            fieldValues: req.body.blogs.fieldValues,
+            fieldTypes: blogData.blogs.fieldTypes,
+            fieldValues: blogData.blogs.fieldValues,
         },
     });
     try {
         const result = yield blog.save();
-        res
-            .status(200)
-            .json({ message: "Blog saved successfully", _id: result._id });
+        blog._id = result._id;
+        res.status(200).json(blog);
     }
     catch (error) {
         (0, throwError_1.default)(next, error);
