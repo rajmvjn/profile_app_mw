@@ -37,15 +37,21 @@ const multerFilter = (req, file, cb) => {
 exports.uploadBlogPhoto = (0, multer_1.default)({
     storage: multerStorage,
     fileFilter: multerFilter,
-});
+}).array("photos", 10);
 const postBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         (0, throwError_1.default)(next, null, "Validation failed, entered data is incorrect.");
     }
     const blogData = JSON.parse(req.body.blog);
-    console.log(req.file);
-    console.log(blogData);
+    let photoArray = req.files ? req.files : [];
+    let photoIndex = 0;
+    blogData.blogs.fieldTypes.forEach((element, index) => {
+        if (element === "photo") {
+            blogData.blogs.fieldValues[index] = photoArray[photoIndex].filename;
+            photoIndex++;
+        }
+    });
     const blog = new blog_1.default({
         userId: blogData.userId,
         blogs: {

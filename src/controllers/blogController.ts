@@ -26,7 +26,7 @@ const multerFilter = (req: any, file: any, cb: any) => {
 export const uploadBlogPhoto = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
-});
+}).array("photos", 10);
 
 export const postBlogs: RequestHandler = async (req, res, next) => {
   const errors = validationResult(req);
@@ -35,9 +35,16 @@ export const postBlogs: RequestHandler = async (req, res, next) => {
   }
 
   const blogData = JSON.parse(req.body.blog);
+  let photoArray = req.files ? (req.files as Express.Multer.File[]) : [];
 
-  console.log(req.file);
-  console.log(blogData);
+  let photoIndex = 0;
+
+  blogData.blogs.fieldTypes.forEach((element: string, index: number) => {
+    if (element === "photo") {
+      blogData.blogs.fieldValues[index] = photoArray[photoIndex].filename;
+      photoIndex++;
+    }
+  });
 
   const blog = new Blog({
     userId: blogData.userId,

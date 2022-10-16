@@ -11,7 +11,7 @@ import {
 
 const router = Router();
 
-router.post("/blogs", uploadBlogPhoto.single("photo"), postBlogs);
+router.post("/blogs", uploadBlogPhoto, postBlogs);
 router.get("/blogs", getBlogs);
 router.delete("/blogs/:id", deleteBlog);
 router.patch("/blogs/:id", updateBlog);

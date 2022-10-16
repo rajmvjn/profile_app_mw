@@ -31,8 +31,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     "GET, POST, PUT, PATCH ,DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   next();
 });
+
+// server public content
+app.use(express.static(`public`));
 
 app.use("/user", userRoutes);
 app.use("/api/v1", blogRoutes);

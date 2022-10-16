@@ -4,7 +4,7 @@ const express_1 = require("express");
 // import { body } from "express-validator";
 const blogController_1 = require("../controllers/blogController");
 const router = (0, express_1.Router)();
-router.post("/blogs", blogController_1.uploadBlogPhoto.single("photo"), blogController_1.postBlogs);
+router.post("/blogs", blogController_1.uploadBlogPhoto, blogController_1.postBlogs);
 router.get("/blogs", blogController_1.getBlogs);
 router.delete("/blogs/:id", blogController_1.deleteBlog);
 router.patch("/blogs/:id", blogController_1.updateBlog);

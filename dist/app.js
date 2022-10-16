@@ -26,8 +26,11 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH ,DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     next();
 });
+// server public content
+app.use(express_1.default.static(`public`));
 app.use("/user", user_1.default);
 app.use("/api/v1", blogs_1.default);
 // Error handling middleware
