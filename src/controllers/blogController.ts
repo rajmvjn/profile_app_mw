@@ -1,17 +1,23 @@
 import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import { unlink } from "node:fs";
 
 import Blog from "../models/blog";
 import throwError from "../utils/throwError";
 
+/*
+image processing..
+*/
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/img/blog");
   },
   filename: (req, file, cb) => {
     const ext = file.mimetype.split("/")[1];
-    cb(null, `blog-${Date.now()}.${ext}`);
+    // cb(null, `blog-${Date.now()}.${ext}`);
+    cb(null, `blog_${uuidv4()}.${ext}`);
   },
 });
 
@@ -28,6 +34,9 @@ export const uploadBlogPhoto = multer({
   fileFilter: multerFilter,
 }).array("photos", 10);
 
+/*
+Blog processing..
+*/
 export const postBlogs: RequestHandler = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -94,8 +103,20 @@ export const updateBlog: RequestHandler = async (req, res, next) => {
 };
 
 export const deleteBlog: RequestHandler = async (req, res, next) => {
+  const blog = req.body.blog;
+
   try {
     await Blog.findByIdAndDelete(req.params.id);
+
+    blog.fieldTypes.forEach((fType: string, index: number) => {
+      if (fType === "photo") {
+        unlink(`public/img/blog/${blog.fieldValues[index]}`, (err) => {
+          if (err) throwError(next, err);
+          // console.log("path/file.txt was deleted");
+        });
+      }
+    });
+
     res.status(200).json({ message: "Blog deleted successfully" });
   } catch (error) {
     throwError(next, error);
