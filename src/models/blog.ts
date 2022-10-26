@@ -14,6 +14,10 @@ const blogSchema = new mongoose.Schema({
       comment: String,
     },
   ],
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("Blog", blogSchema);

@@ -77,7 +77,7 @@ export const getBlogs: RequestHandler = async (req, res, next) => {
 
   try {
     blogs = await Blog.find();
-    res.status(200).json({ blogs: blogs });
+    res.status(200).json({ blogs: blogs.reverse() });
   } catch (error) {
     throwError(next, error);
   }

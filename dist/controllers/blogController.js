@@ -82,7 +82,7 @@ const getBlogs = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let blogs;
     try {
         blogs = yield blog_1.default.find();
-        res.status(200).json({ blogs: blogs });
+        res.status(200).json({ blogs: blogs.reverse() });
     }
     catch (error) {
         (0, throwError_1.default)(next, error);
