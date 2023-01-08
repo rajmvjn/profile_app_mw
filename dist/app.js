@@ -12,6 +12,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const compression_1 = __importDefault(require("compression"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const morgan_1 = __importDefault(require("morgan"));
+const cors_1 = __importDefault(require("cors"));
 const user_1 = __importDefault(require("./routes/user"));
 const blogs_1 = __importDefault(require("./routes/blogs"));
 const app = (0, express_1.default)();
@@ -20,6 +21,7 @@ const accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dir
 app.use((0, helmet_1.default)()); // Helmet helps you secure your Express apps by setting various HTTP headers.
 app.use((0, compression_1.default)()); // Compress all routes
 app.use((0, morgan_1.default)("combined", { stream: accessLogStream })); // Logging
+app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 // enable CORS
 app.use((req, res, next) => {
