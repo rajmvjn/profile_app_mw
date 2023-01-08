@@ -7,7 +7,6 @@ import helmet from "helmet";
 import compression from "compression";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import cors from "cors";
 import userRoutes from "./routes/user";
 import blogRoutes from "./routes/blogs";
 
@@ -22,7 +21,6 @@ const accessLogStream = fs.createWriteStream(
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
 app.use(compression()); // Compress all routes
 app.use(morgan("combined", { stream: accessLogStream })); // Logging
-app.use(cors());
 app.use(bodyParser.json());
 
 // enable CORS
